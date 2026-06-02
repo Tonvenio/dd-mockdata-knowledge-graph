@@ -1,0 +1,207 @@
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix org:   <http://www.w3.org/ns/org#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix time:  <http://www.w3.org/2006/time#> .
+@prefix schema:<https://schema.org/> .
+@prefix dd:    <https://w3id.org/dd-mockdata#> .
+
+dd: a owl:Ontology ;
+    rdfs:label "dd-mockdata-kg ontology"@en ;
+    rdfs:comment "Knowledge-graph schema for the dd-mockdata German due-diligence corpus."@en ;
+    owl:versionInfo "0.1.0" .
+
+# ─────────────────────────────────────────────────────────────────────
+# Core classes
+# ─────────────────────────────────────────────────────────────────────
+
+dd:Company a owl:Class ;
+    rdfs:subClassOf org:FormalOrganization, schema:Corporation ;
+    rdfs:comment "A juristische Person (GmbH, AG, Sp. z o.o., s.r.o., Kft., Co. Ltd., etc.)" .
+
+dd:Subsidiary a owl:Class ;
+    rdfs:subClassOf dd:Company ;
+    rdfs:comment "A subsidiary of a holding company; linked via dd:parentCompany." .
+
+dd:Holding a owl:Class ;
+    rdfs:subClassOf dd:Company ;
+    rdfs:comment "A Holding-Gesellschaft (no operative function; manages subsidiaries)." .
+
+dd:Counterparty a owl:Class ;
+    rdfs:subClassOf dd:Company ;
+    rdfs:comment "A third-party organisation acting as customer / supplier / advisor (BMW, KPMG, etc.)." .
+
+dd:Person a owl:Class ;
+    rdfs:subClassOf foaf:Person, schema:Person .
+
+dd:Position a owl:Class ;
+    rdfs:subClassOf org:Membership ;
+    rdfs:comment "A role someone holds at an organisation for a time period." .
+
+dd:Role a owl:Class ;
+    rdfs:subClassOf org:Role .
+
+dd:Contract a owl:Class ;
+    rdfs:subClassOf schema:Contract .
+
+dd:EmploymentContract a owl:Class ; rdfs:subClassOf dd:Contract .
+dd:SupplyContract     a owl:Class ; rdfs:subClassOf dd:Contract .
+dd:LoanFacility       a owl:Class ; rdfs:subClassOf dd:Contract .
+dd:LicenseContract    a owl:Class ; rdfs:subClassOf dd:Contract .
+dd:LeaseContract      a owl:Class ; rdfs:subClassOf dd:Contract .
+dd:ServiceContract    a owl:Class ; rdfs:subClassOf dd:Contract .
+dd:NDA                a owl:Class ; rdfs:subClassOf dd:Contract .
+
+dd:Patent a owl:Class ; rdfs:subClassOf schema:CreativeWork .
+dd:Product a owl:Class ; rdfs:subClassOf schema:Product .
+
+dd:Covenant a owl:Class ;
+    rdfs:comment "A financial covenant attached to a loan facility (e.g. Net-Debt/EBITDA <= 3.0x)." .
+
+dd:CovenantObservation a owl:Class ;
+    rdfs:comment "A point-in-time observation of a covenant's value (e.g. Q3/2023: 0.32x)." .
+
+dd:ICTransaction a owl:Class ;
+    rdfs:comment "Intercompany transaction (invoice, loan, service) between two group entities." .
+
+dd:PensionPlan a owl:Class ;
+    rdfs:comment "Defined-benefit / defined-contribution pension plan." .
+
+dd:Acquisition a owl:Class ;
+    rdfs:subClassOf schema:Action ;
+    rdfs:comment "M&A transaction (asset deal or share deal)." .
+
+dd:WorksCouncil a owl:Class ;
+    rdfs:subClassOf org:Organization .
+
+dd:DocumentReference a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:comment "A reference to a specific file (and optional paragraph) in the corpus." .
+
+# ─────────────────────────────────────────────────────────────────────
+# Object properties
+# ─────────────────────────────────────────────────────────────────────
+
+dd:parentCompany a owl:ObjectProperty ;
+    rdfs:domain dd:Subsidiary ; rdfs:range dd:Holding ;
+    rdfs:comment "Holding-relationship: subsidiary --parent--> holding (100% Tochter via RHO)." .
+
+dd:holdsPosition a owl:ObjectProperty ;
+    rdfs:domain dd:Person ; rdfs:range dd:Position .
+
+dd:positionRole a owl:ObjectProperty ;
+    rdfs:domain dd:Position ; rdfs:range dd:Role .
+
+dd:positionAt a owl:ObjectProperty ;
+    rdfs:domain dd:Position ; rdfs:range dd:Company .
+
+dd:partyTo a owl:ObjectProperty ;
+    rdfs:domain dd:Company, dd:Person ;
+    rdfs:range dd:Contract .
+
+dd:counterpartyOf a owl:ObjectProperty ;
+    rdfs:domain dd:Contract ; rdfs:range dd:Company, dd:Person .
+
+dd:governedBy a owl:ObjectProperty ;
+    rdfs:domain dd:LoanFacility ; rdfs:range dd:Covenant .
+
+dd:observationOf a owl:ObjectProperty ;
+    rdfs:domain dd:CovenantObservation ; rdfs:range dd:Covenant .
+
+dd:inventedBy a owl:ObjectProperty ;
+    rdfs:domain dd:Patent ; rdfs:range dd:Person .
+
+dd:assignee a owl:ObjectProperty ;
+    rdfs:domain dd:Patent ; rdfs:range dd:Company .
+
+dd:relatesTo a owl:ObjectProperty ;
+    rdfs:domain dd:Patent ; rdfs:range dd:Product .
+
+dd:involvesTarget a owl:ObjectProperty ;
+    rdfs:domain dd:Acquisition ; rdfs:range dd:Company .
+
+dd:involvesAcquirer a owl:ObjectProperty ;
+    rdfs:domain dd:Acquisition ; rdfs:range dd:Company .
+
+dd:sourceDocument a owl:ObjectProperty ;
+    rdfs:subPropertyOf prov:wasDerivedFrom ;
+    rdfs:range dd:DocumentReference ;
+    rdfs:comment "Every triple in a named graph should have at least one provenance link." .
+
+# ─────────────────────────────────────────────────────────────────────
+# Datatype properties
+# ─────────────────────────────────────────────────────────────────────
+
+dd:hrb         a owl:DatatypeProperty ; rdfs:domain dd:Company ; rdfs:range xsd:string .
+dd:isin        a owl:DatatypeProperty ; rdfs:domain dd:Company ; rdfs:range xsd:string .
+dd:wkn         a owl:DatatypeProperty ; rdfs:domain dd:Company ; rdfs:range xsd:string .
+dd:ustId       a owl:DatatypeProperty ; rdfs:domain dd:Company ; rdfs:range xsd:string .
+dd:steuerNr    a owl:DatatypeProperty ; rdfs:domain dd:Company ; rdfs:range xsd:string .
+dd:iban        a owl:DatatypeProperty ; rdfs:domain dd:Company ; rdfs:range xsd:string .
+dd:countryCode a owl:DatatypeProperty ; rdfs:domain dd:Company ; rdfs:range xsd:string ;
+               rdfs:comment "ISO 3166-1 alpha-2." .
+dd:employees   a owl:DatatypeProperty ; rdfs:domain dd:Company ; rdfs:range xsd:integer .
+dd:revenueEur  a owl:DatatypeProperty ; rdfs:domain dd:Company ; rdfs:range xsd:decimal .
+dd:ebitdaEur   a owl:DatatypeProperty ; rdfs:domain dd:Company ; rdfs:range xsd:decimal .
+
+dd:appointedOn a owl:DatatypeProperty ; rdfs:domain dd:Position ; rdfs:range xsd:date .
+dd:resignedOn  a owl:DatatypeProperty ; rdfs:domain dd:Position ; rdfs:range xsd:date .
+
+dd:effectiveDate a owl:DatatypeProperty ; rdfs:domain dd:Contract ; rdfs:range xsd:date .
+dd:expiryDate    a owl:DatatypeProperty ; rdfs:domain dd:Contract ; rdfs:range xsd:date .
+dd:volumeEur     a owl:DatatypeProperty ; rdfs:domain dd:Contract ; rdfs:range xsd:decimal .
+
+dd:filingNumber a owl:DatatypeProperty ; rdfs:domain dd:Patent ; rdfs:range xsd:string .
+dd:jurisdiction a owl:DatatypeProperty ; rdfs:domain dd:Patent ; rdfs:range xsd:string ;
+                rdfs:comment "DE / EP / US / CN / JP / WO etc." .
+
+dd:covenantName     a owl:DatatypeProperty ; rdfs:domain dd:Covenant ; rdfs:range xsd:string .
+dd:covenantOperator a owl:DatatypeProperty ; rdfs:domain dd:Covenant ; rdfs:range xsd:string ;
+                    rdfs:comment "<= / >= / = / <" .
+dd:covenantThreshold a owl:DatatypeProperty ; rdfs:domain dd:Covenant ; rdfs:range xsd:decimal .
+dd:observedValue     a owl:DatatypeProperty ; rdfs:domain dd:CovenantObservation ; rdfs:range xsd:decimal .
+dd:observedAt        a owl:DatatypeProperty ; rdfs:domain dd:CovenantObservation ; rdfs:range xsd:date .
+
+dd:confidence a owl:DatatypeProperty ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "[0,1] extractor confidence; canonical extractor always 1.0." .
+
+dd:filePath  a owl:DatatypeProperty ; rdfs:domain dd:DocumentReference ; rdfs:range xsd:string .
+dd:paragraph a owl:DatatypeProperty ; rdfs:domain dd:DocumentReference ; rdfs:range xsd:integer .
+
+# ─────────────────────────────────────────────────────────────────────
+# v0.2 — document-level extractor vocabulary (additive)
+# ─────────────────────────────────────────────────────────────────────
+
+dd:Event a owl:Class ;
+    rdfs:comment "A dated corporate event recorded in the corpus (meeting, review)." .
+dd:ShareholderMeeting a owl:Class ; rdfs:subClassOf dd:Event ;
+    rdfs:comment "Hauptversammlung (HV)." .
+dd:BoardMeeting a owl:Class ; rdfs:subClassOf dd:Event ;
+    rdfs:comment "Aufsichtsrats-Sitzung." .
+dd:WorksCouncilMeeting a owl:Class ; rdfs:subClassOf dd:Event ;
+    rdfs:comment "Betriebsrats-Sitzung (BR-Protokoll)." .
+dd:ReviewEvent a owl:Class ; rdfs:subClassOf dd:Event ;
+    rdfs:comment "Quarterly Business Review (QBR) with an OEM." .
+dd:TransferPricingFile a owl:Class ; rdfs:subClassOf dd:DocumentReference ;
+    rdfs:comment "OECD Local File transfer-pricing documentation for a subsidiary." .
+
+dd:eventDate    a owl:DatatypeProperty ; rdfs:domain dd:Event ; rdfs:range xsd:date .
+dd:eventOrg     a owl:ObjectProperty  ; rdfs:domain dd:Event ; rdfs:range dd:Company .
+dd:annualFeeYear a owl:DatatypeProperty ; rdfs:domain dd:Patent ; rdfs:range xsd:integer ;
+                 rdfs:comment "Year a Jahresgebühr (annual fee) was paid for the patent." .
+dd:patentStatus a owl:DatatypeProperty ; rdfs:domain dd:Patent ; rdfs:range xsd:string ;
+                rdfs:comment "Erteilt / Angemeldet / Provisional, etc." .
+dd:patentTitle  a owl:DatatypeProperty ; rdfs:domain dd:Patent ; rdfs:range xsd:string .
+dd:governedByFacility a owl:ObjectProperty ; rdfs:domain dd:Covenant ; rdfs:range dd:LoanFacility ;
+                rdfs:comment "Inverse-style link from a covenant to the loan facility it constrains." .
+dd:covenantValue a owl:DatatypeProperty ; rdfs:domain dd:CovenantObservation ; rdfs:range xsd:decimal ;
+                rdfs:comment "Alias kept for clarity; see dd:observedValue." .
+
+dd:documentOrg a owl:ObjectProperty ; rdfs:domain dd:DocumentReference ; rdfs:range dd:Company ;
+               rdfs:comment "The corpus entity (group company) a document belongs to." .
+dd:docType a owl:DatatypeProperty ; rdfs:domain dd:DocumentReference ; rdfs:range xsd:string ;
+           rdfs:comment "Coarse document class derived from the filename prefix (employment, patent, supply, covenant, board-meeting, …)." .

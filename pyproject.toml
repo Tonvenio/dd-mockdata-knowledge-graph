@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dd-mockdata-kg"
+version = "0.1.0"
+description = "Knowledge-graph extraction & evaluation harness for the dd-mockdata German due-diligence corpus"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Marc Ohrendorf" }]
+keywords = ["knowledge-graph", "legal-tech", "german", "due-diligence", "rdf", "neo4j", "rag-evaluation"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: German",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+dependencies = [
+    "python-docx>=1.1.0",
+    "openpyxl>=3.1.0",
+    "rdflib>=7.0.0",
+    "pyshacl>=0.25.0",
+    "networkx>=3.2",
+]
+
+[project.optional-dependencies]
+neo4j = ["neo4j>=5.18.0"]
+llm   = ["anthropic>=0.30.0", "openai>=1.30.0"]
+dev   = ["pytest>=8.0.0", "ruff>=0.4.0", "mypy>=1.10.0"]
+# Visualisation helpers under scripts/ (subgraph PNG, interactive HTML, build GIF)
+viz   = ["matplotlib>=3.8", "scipy>=1.11", "pyvis>=0.3.2", "pillow>=10.0"]
+
+[project.scripts]
+ddkg = "ddkg.cli:main"
+
+[project.urls]
+Homepage   = "https://github.com/Tonvenio/dd-mockdata-knowledge-graph"
+Dataset    = "https://github.com/Tonvenio/dd-mockdata"
+Repository = "https://github.com/Tonvenio/dd-mockdata-knowledge-graph"
+
+[tool.setuptools.packages.find]
+include = ["ddkg*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"

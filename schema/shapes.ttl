@@ -1,0 +1,44 @@
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix dd:   <https://w3id.org/dd-mockdata#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+dd:PersonShape a sh:NodeShape ;
+    sh:targetClass dd:Person ;
+    sh:property [
+        sh:path dd:holdsPosition ;
+        sh:minCount 1 ;
+        sh:message "Every Person must hold at least one Position." ;
+    ] .
+
+dd:SubsidiaryShape a sh:NodeShape ;
+    sh:targetClass dd:Subsidiary ;
+    sh:property [
+        sh:path dd:parentCompany ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:message "Every Subsidiary must have exactly one parent Company." ;
+    ] .
+
+dd:PositionShape a sh:NodeShape ;
+    sh:targetClass dd:Position ;
+    sh:property [
+        sh:path dd:positionAt ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path dd:positionRole ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+    ] .
+
+dd:CovenantShape a sh:NodeShape ;
+    sh:targetClass dd:Covenant ;
+    sh:property [ sh:path dd:covenantName     ; sh:minCount 1 ; sh:datatype xsd:string  ] ;
+    sh:property [ sh:path dd:covenantOperator ; sh:minCount 1 ; sh:in ( "<=" ">=" "<" ">" "=" ) ] ;
+    sh:property [ sh:path dd:covenantThreshold; sh:minCount 1 ; sh:datatype xsd:decimal ] .
+
+dd:CompanyShape a sh:NodeShape ;
+    sh:targetClass dd:Company ;
+    sh:property [
+        sh:path dd:countryCode ;
+        sh:pattern "^[A-Z]{2}$" ;
+        sh:message "countryCode must be ISO 3166-1 alpha-2." ;
+    ] .

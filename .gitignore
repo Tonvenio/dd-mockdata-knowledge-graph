@@ -1,0 +1,32 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.idea/
+.vscode/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+build/
+dist/
+
+# Local KG builds (regenerable). Keep the schema and a small sample;
+# allow committing kg/gold.* if you want to ship the canonical KG with the
+# repo (remove the line below to do so).
+kg/*.ttl
+kg/*.jsonld
+kg/*.cypher
+kg/*.graphml
+# regenerable visualisations (the README copies live in assets/)
+kg/*.png
+kg/*.gif
+kg/*.html
+!kg/README.md
+
+# pyvis drops its vendored JS/CSS here when generating interactive HTML
+lib/
+
+# Local notes
+NOTES.local.md
